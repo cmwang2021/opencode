@@ -56,3 +56,50 @@ index d35b3e0695a9c85b261bc1a4fbe23c0a60d5b204..d516a9d00f1233173f9a3e2144666c81
    private getFurthestMeasurement = (
      measurements: Array<VirtualItem>,
      index: number,
+diff --git a/dist/cjs/index.cjs b/dist/cjs/index.cjs
+@@ -716,10 +716,12 @@
+         this.options.lanes
+       ],
+       (measurements, outerSize, scrollOffset, lanes) => {
++        const maxScrollOffset = Math.max(this.getTotalSize() - outerSize, 0);
++        const effectiveScrollOffset = Math.min(Math.max(scrollOffset, 0), maxScrollOffset);
+         return this.range = measurements.length > 0 && outerSize > 0 ? calculateRange({
+           measurements,
+           outerSize,
+-          scrollOffset,
++          scrollOffset: effectiveScrollOffset,
+           lanes,
+           // Pass the typed array so binary search + forward-walk can
+           // read start/end directly from Float64Array, skipping the
+diff --git a/dist/esm/index.js b/dist/esm/index.js
+@@ -714,10 +714,12 @@
+         this.options.lanes
+       ],
+       (measurements, outerSize, scrollOffset, lanes) => {
++        const maxScrollOffset = Math.max(this.getTotalSize() - outerSize, 0);
++        const effectiveScrollOffset = Math.min(Math.max(scrollOffset, 0), maxScrollOffset);
+         return this.range = measurements.length > 0 && outerSize > 0 ? calculateRange({
+           measurements,
+           outerSize,
+-          scrollOffset,
++          scrollOffset: effectiveScrollOffset,
+           lanes,
+           // Pass the typed array so binary search + forward-walk can
+           // read start/end directly from Float64Array, skipping the
+diff --git a/src/index.ts b/src/index.ts
+@@ -1336,12 +1336,14 @@
+       this.options.lanes,
+     ],
+     (measurements, outerSize, scrollOffset, lanes) => {
++      const maxScrollOffset = Math.max(this.getTotalSize() - outerSize, 0)
++      const effectiveScrollOffset = Math.min(Math.max(scrollOffset, 0), maxScrollOffset)
+       return (this.range =
+         measurements.length > 0 && outerSize > 0
+           ? calculateRange({
+               measurements,
+               outerSize,
+-              scrollOffset,
++              scrollOffset: effectiveScrollOffset,
+               lanes,
+               // Pass the typed array so binary search + forward-walk can
+               // read start/end directly from Float64Array, skipping the
