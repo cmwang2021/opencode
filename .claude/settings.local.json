@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs -r kill -9)",
+      "Bash(lsof -ti:3001)",
+      "Bash(lsof -ti:3002)",
+      "Bash(bun run *)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/v1/chat/completions -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(curl -s http://localhost:3000/v1/models -H 'Content-Type: application/json')",
+      "Bash(curl -s http://localhost:3000/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\": \"__TRACKED_VAR__\", \"messages\": [{\"role\": \"user\", \"content\": \"hi\"}], \"max_tokens\": 5, \"stream\": false}')",
+      "Bash(python3 *)",
+      "Bash(curl -s http://localhost:3000/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\": \"opencode:nonexistent-model-xyz\", \"messages\": [{\"role\":\"user\",\"content\":\"hi\"}], \"max_tokens\": 5, \"stream\": false}')",
+      "Bash(curl -s http://localhost:3000/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\": \"big-pickle\", \"messages\": [{\"role\":\"user\",\"content\":\"hi\"}], \"max_tokens\": 5, \"stream\": false}')",
+      "Bash(gh repo *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://github.com/cmwang2021/shrimp-opencode)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://github.com/cmwang2021/shrimp-jsonguard)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://github.com/cmwang2021/shrimp-opencode/tree/feature/shrimp-proxy-v8-heart)",
+      "Bash(bun --version)",
+      "Bash(curl -s https://raw.githubusercontent.com/cmwang2021/shrimp-opencode/feature/shrimp-proxy-v8-heart/packages/shrimp-proxy/src/index.ts)",
+      "Bash(curl -s https://api.github.com/repos/cmwang2021/shrimp-opencode/git/trees/feature/shrimp-proxy-v8-heart?recursive=1)",
+      "Bash(curl *)",
+      "Bash(lsof -ti:20131)",
+      "Bash(PORT=20131 bun run src/index.ts)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/hono/package.json'\\).version\\)\")",
+      "Bash(bun install *)",
+      "Bash(node tests/shrimp-heart-stress.js --endpoint http://localhost:20131 --loops 50)",
+      "Bash(node tests/shrimp-heart-stress.js --endpoint http://localhost:20131 --loops 5)"
+    ]
+  }
+}
