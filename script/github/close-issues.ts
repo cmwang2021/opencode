@@ -32,25 +32,43 @@ async function close(num: number) {
     headers,
     body: JSON.stringify({ body: msg }),
   })
-  if (!comment.ok) throw new Error(`Failed to comment #${num}: ${comment.status} ${comment.statusText}`)
+  
+  // Skip if 403 (no permission to comment) or 404 (issue not found)
+  if (comment.status === 403) {
+    console.log(`⚠️  Skipped commenting on #${num} (403 Forbidden - may be from fork or protected)`)
+  } else if (comment.status === 404) {
+    console.log(`⚠️  Skipped commenting on #${num} (404 Not Found - issue may have been deleted)`)
+  } else if (!comment.ok) {
+    throw new Error(`Failed to comment #${num}: ${comment.status} ${comment.statusText}`)
+  } else {
+    console.log(`✓ Commented on #${num}`)
+  }
 
   const patch = await fetch(base, {
     method: "PATCH",
     headers,
     body: JSON.stringify({ state: "closed", state_reason: "not_planned" }),
   })
+  
+  // If close fails with 404, the issue doesn't exist - skip it
+  if (patch.status === 404) {
+    console.log(`⚠️  Skipped closing #${num} (404 Not Found)`)
+    return
+  }
+  
   if (!patch.ok) throw new Error(`Failed to close #${num}: ${patch.status} ${patch.statusText}`)
 
-  console.log(`Closed https://github.com/${repo}/issues/${num}`)
+  console.log(`✓ Closed https://github.com/${repo}/issues/${num}`)
 }
 
 async function main() {
   let page = 1
   let closed = 0
+  let skipped = 0
 
   while (true) {
     const res = await fetch(
-      `https://api.github.com/repos/${repo}/issues?state=open&sort=updated&direction=asc&per_page=100&page=${page}`,
+      `https://api.github.com/repos/${repo}/issues?state=open&sort=updated&direction=asc&per_page=100&page=${page}&exclude_pull_requests=true`,
       { headers },
     )
     if (!res.ok) throw new Error(res.statusText)
@@ -68,26 +86,36 @@ async function main() {
         console.log(`\nFound fresh issue #${i.number}, stopping`)
         if (stale.length > 0) {
           for (const num of stale) {
-            await close(num)
-            closed++
+            try {
+              await close(num)
+              closed++
+            } catch (err) {
+              console.error(`Error closing #${num}:`, err)
+              skipped++
+            }
           }
         }
-        console.log(`Closed ${closed} issues total`)
+        console.log(`\n✓ Closed ${closed} issues, ⚠️  Skipped ${skipped} issues`)
         return
       }
     }
 
     if (stale.length > 0) {
       for (const num of stale) {
-        await close(num)
-        closed++
+        try {
+          await close(num)
+          closed++
+        } catch (err) {
+          console.error(`Error closing #${num}:`, err)
+          skipped++
+        }
       }
     }
 
     page++
   }
 
-  console.log(`Closed ${closed} issues total`)
+  console.log(`\n✓ Closed ${closed} issues total, ⚠️  Skipped ${skipped} issues`)
 }
 
 main().catch((err) => {
